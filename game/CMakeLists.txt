@@ -8,12 +8,16 @@ target_sources(pong_game PRIVATE
     src/Game.cpp
     src/WindowManager.cpp
     src/InputHandler.cpp
+    src/Physics.cpp
+    src/GameObject.cpp
+    src/Ball.cpp
+    src/Paddle.cpp
     src/main.cpp 
 )
 
 target_link_libraries(pong_game
     glfw 
     # GLEW::GLEW 
-    # glm::glm
+    glm::glm
     spdlog::spdlog
 )
