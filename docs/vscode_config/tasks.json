@@ -1,0 +1,74 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "clean-build-folder",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "if (Test-Path '${workspaceFolder}\\build') { Remove-Item -Path '${workspaceFolder}\\build' -Recurse -Force }"
+      ],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "conan-install",
+      "type": "shell",
+      "command": "conan install . --output-folder=build --build=missing",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake-configure-debug",
+      "type": "shell",
+      "command": "cmake .. --preset conan-debug -DCMAKE_BUILD_TYPE=Debug",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "cmake-build",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "."
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "clean-rebuild",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "clean-build-folder",
+        "conan-install",
+        "cmake-configure-debug",
+        "cmake-build"
+      ],
+      "group": {
+        "kind": "build"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run-executable",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/bin/pong_game.exe",
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
