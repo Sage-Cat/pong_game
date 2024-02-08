@@ -1,0 +1,9 @@
+{
+    "version": 4,
+    "vendor": {
+        "conan": {}
+    },
+    "include": [
+        "C:\\Users\\sagec\\Desktop\\git_projects\\pong_game\\build\\CMakePresets.json"
+    ]
+}
