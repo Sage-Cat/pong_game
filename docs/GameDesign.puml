@@ -1,0 +1,56 @@
+@startuml
+
+class Game {
+    +start()
+    +update()
+    +render()
+}
+
+class WindowManagement {
+    +createWindow()
+    +closeWindow()
+}
+
+class InputHandling {
+    +pollEvents()
+}
+
+class GameObject {
+    -position
+    -velocity
+}
+
+class Paddle extends GameObject {
+    +moveUp()
+    +moveDown()
+}
+
+class Ball extends GameObject {
+    +updatePosition()
+    +checkCollision()
+}
+
+class Physics {
+    +detectCollision()
+    +resolveCollision()
+}
+
+class Rendering {
+    +drawObject()
+}
+
+class Score {
+    +updateScore()
+    +displayScore()
+}
+
+Game --> WindowManagement
+Game --> InputHandling
+Game --> Physics
+Game --> Rendering
+Game --> Score
+
+Physics --> GameObject : detects & resolves
+Rendering --> GameObject : draws
+
+@enduml
