@@ -18,8 +18,8 @@ The game architecture is designed around several key components to manage differ
 
 ### Components Explanation
 
-- **Game**: Central class that initializes the game components, contains the game loop, and coordinates the game flow.
-- **WindowManagement**: Manages the lifecycle of the game window.
+- **Game**: Central class that inits the game components, contains the game loop, and coordinates the game flow.
+- **WindowManager**: Manages the lifecycle of the game window.
 - **InputHandling**: Processes user input and updates game state accordingly.
 - **GameObject**: Base class for any object in the game, with Paddle and Ball as subclasses inheriting common properties like position and velocity.
 - **Physics**: Handles the logic for moving objects and detecting collisions.

@@ -6,6 +6,8 @@ target_include_directories(pong_game PRIVATE ${GAME_DIR}/include)
 target_sources(pong_game PRIVATE 
     src/SpdlogConfig.cpp 
     src/Game.cpp
+    src/WindowManager.cpp
+    src/InputHandler.cpp
     src/main.cpp 
 )
 

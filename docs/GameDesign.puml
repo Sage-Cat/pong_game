@@ -6,12 +6,12 @@ class Game {
     +render()
 }
 
-class WindowManagement {
+class WindowManager {
     +createWindow()
     +closeWindow()
 }
 
-class InputHandling {
+class InputHandler {
     +pollEvents()
 }
 
@@ -44,7 +44,7 @@ class Score {
     +displayScore()
 }
 
-Game --> WindowManagement
+Game --> WindowManager
 Game --> InputHandling
 Game --> Physics
 Game --> Rendering
