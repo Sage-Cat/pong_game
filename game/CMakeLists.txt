@@ -12,12 +12,15 @@ target_sources(pong_game PRIVATE
     src/GameObject.cpp
     src/Ball.cpp
     src/Paddle.cpp
+    src/Renderer.cpp
     src/main.cpp 
 )
 
 target_link_libraries(pong_game
     glfw 
-    # GLEW::GLEW 
+    GLEW::GLEW 
     glm::glm
     spdlog::spdlog
 )
+
+add_definitions(-DSHADERS_DIR="${GAME_DIR}/shaders")
