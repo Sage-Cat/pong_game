@@ -1,82 +1,59 @@
 # Pong Game
 
-Small "Pong" game project created for learning purposes. This project uses modern C++ practices and libraries such as GLFW, GLEW, GLM, SPDLOG, and Google Test for unit testing. The game is a simple implementation of the classic Pong game with basic physics, input handling, and score tracking.
+[![CI](https://github.com/Sage-Cat/pong_game/actions/workflows/ci.yml/badge.svg)](https://github.com/Sage-Cat/pong_game/actions/workflows/ci.yml)
+
+A small two-player Pong game written in C++20 with OpenGL 3.3, GLFW, GLEW,
+GLM, and spdlog. It is a learning project with a compact game loop, deterministic
+collision tests, and a virtual-display startup check.
+
+## Controls
+
+- Left paddle: `W` / `S`
+- Right paddle: Up / Down arrows
+- Quit: `Esc` or close the window
+
+The score appears in the window title. The ball resets after each point.
+
+## Build
+
+The continuously tested platform is Ubuntu 24.04. Install the native packages:
+
+```sh
+sudo apt-get install g++ cmake ninja-build libglfw3-dev libglew-dev libglm-dev libspdlog-dev libgl1-mesa-dev
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+./build/bin/pong_game
+```
+
+Alternatively, Conan 2 can provide the dependencies:
+
+```sh
+conan profile detect --force
+conan install . --output-folder=build --build=missing -s build_type=Release -s compiler.cppstd=20
+cmake --preset conan-release
+cmake --build --preset conan-release
+ctest --preset conan-release --output-on-failure
+```
+
+Windows is intended to work through the same CMake/Conan build, but is not
+currently covered by CI.
 
 ## Design
 
-The game architecture is designed around several key components to manage different aspects of the game lifecycle and functionality:
-
-- **Game Loop**: Central loop controlling the game state updates and rendering.
-- **Window Management**: Handles the creation, display, and closing of the game window.
-- **Input Handling**: Manages user inputs, such as paddle movement via keyboard.
-- **Game Objects**: Represents entities in the game, primarily the paddles and ball.
-- **Physics**: Manages the movement of the game objects and detects collisions.
-- **Rendering**: Draws the game objects to the screen each frame.
-- **Score**: Keeps track of and displays the players' scores.
-
 ![Game Design schema](docs/GameDesign.png)
 
-### Components Explanation
+`Game` coordinates GLFW input, gameplay state, physics, scoring, and rendering.
+`pong_core` contains the window-independent movement and collision rules used by
+the deterministic tests. Shader source is copied beside the build output at
+configure time; no third-party media assets are bundled.
 
-- **Game**: Central class that inits the game components, contains the game loop, and coordinates the game flow.
-- **WindowManager**: Manages the lifecycle of the game window.
-- **InputHandling**: Processes user input and updates game state accordingly.
-- **GameObject**: Base class for any object in the game, with Paddle and Ball as subclasses inheriting common properties like position and velocity.
-- **Physics**: Handles the logic for moving objects and detecting collisions.
-- **Rendering**: Responsible for drawing the game objects to the window.
-- **Score**: Tracks and displays the game score.
+## Limitations
 
-## Dependencies
-
-To build and run this game, you'll need the following libraries:
-
-- GLFW 3.3.8
-- GLEW 2.2.0
-- GLM 0.9.9.8
-- SPDLOG 1.12.0
-- Google Test 1.14.0
-
-You can easily install these dependencies using Conan, a C++ package manager. A `conanfile.txt` is provided in the root of the project to simplify this process:
-
-```plaintext
-[requires]
-glfw/3.3.8
-glew/2.2.0
-glm/0.9.9.8
-spdlog/1.12.0
-gtest/1.14.0
-
-[generators]
-CMakeDeps
-CMakeToolchain
-```
-
-## Building the Project
-
-```
-conan install . --output-folder=build --build=missing
-cd build
-cmake .. --preset conan-debug -DCMAKE_BUILD_TYPE=Debug
-cmake --build .
-```
-
-Alternatively you could use my VSCode [tasks.json](docs/vscode_config/tasks.json) (only Windows) to run `clean-rebuild` task.
-
-## Running the Game
-
-For Windows:
-```
-.\bin\pong_game.exe
-```
-or for Linux:
-```
-./bin/pong_game
-```
-
-## Contributing
-
-Project created for learning purpose, so your contribution is not needed. But you can fork this guy and do whatever you want :kissing_cat:
+This remains a local two-player prototype: it has no audio, menus, AI opponent,
+network play, saved settings, or packaged installer. Collision detection is
+discrete and may tunnel at unusually high speeds.
 
 ## License
 
-This project is licensed under the terms of the [MIT LICENCE](LICENSE).
+This project is licensed under the [MIT License](LICENSE).

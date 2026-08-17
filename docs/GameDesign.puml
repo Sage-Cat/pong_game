@@ -1,56 +1,58 @@
 @startuml
 
 class Game {
-    +start()
-    +update()
-    +render()
+    +run(frameLimit)
+    -update(deltaTime)
+    -render()
 }
 
 class WindowManager {
-    +createWindow()
-    +closeWindow()
+    +init()
+    +shutdown()
+    +shouldClose()
 }
 
 class InputHandler {
-    +pollEvents()
+    +leftPaddleDirection()
+    +rightPaddleDirection()
 }
 
 class GameObject {
     -position
+    -size
     -velocity
+    +update(deltaTime)
 }
 
 class Paddle extends GameObject {
-    +moveUp()
-    +moveDown()
+    +update(deltaTime)
 }
 
 class Ball extends GameObject {
-    +updatePosition()
-    +checkCollision()
+    +update(deltaTime)
 }
 
 class Physics {
-    +detectCollision()
-    +resolveCollision()
+    +update(ball, paddles): ScoreEvent
 }
 
-class Rendering {
-    +drawObject()
+class Renderer {
+    +drawBall()
+    +drawPaddle()
 }
 
 class Score {
-    +updateScore()
-    +displayScore()
+    +scoreLeft()
+    +scoreRight()
 }
 
 Game --> WindowManager
-Game --> InputHandling
+Game --> InputHandler
 Game --> Physics
-Game --> Rendering
+Game --> Renderer
 Game --> Score
 
 Physics --> GameObject : detects & resolves
-Rendering --> GameObject : draws
+Renderer --> GameObject : draws
 
 @enduml
