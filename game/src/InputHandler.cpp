@@ -1,9 +1,13 @@
 #include "InputHandler.hpp"
 
-#include <spdlog/spdlog.h>
+#include <stdexcept>
 
 InputHandler::InputHandler(GLFWwindow *window) : window_(window)
 {
+    if (!window_)
+    {
+        throw std::invalid_argument("InputHandler requires a valid GLFW window");
+    }
     setupCallbacks();
 }
 
@@ -15,6 +19,8 @@ void InputHandler::setupCallbacks()
 
 void InputHandler::keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
+    (void)scancode;
+    (void)mods;
     // Retrieve the instance from the window user pointer and forward the event to the instance method
     auto handler = static_cast<InputHandler *>(glfwGetWindowUserPointer(window));
     if (handler)
@@ -23,23 +29,30 @@ void InputHandler::keyCallback(GLFWwindow *window, int key, int scancode, int ac
     }
 }
 
-void InputHandler::handleKeyPress(int key, int action)
+void InputHandler::handleKeyPress(int key, int action) const
 {
-    if (action == GLFW_PRESS || action == GLFW_REPEAT)
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        switch (key)
-        {
-        case GLFW_KEY_UP:
-            SPDLOG_INFO("Up key pressed");
-            // Handle up movement
-            break;
-        case GLFW_KEY_DOWN:
-            SPDLOG_INFO("Down key pressed");
-            // Handle down movement
-            break;
-        // Add more cases as needed for other keys
-        default:
-            break;
-        }
+        glfwSetWindowShouldClose(window_, GLFW_TRUE);
     }
+}
+
+namespace
+{
+float directionForKeys(GLFWwindow *window, int upKey, int downKey)
+{
+    const bool up = glfwGetKey(window, upKey) == GLFW_PRESS;
+    const bool down = glfwGetKey(window, downKey) == GLFW_PRESS;
+    return static_cast<float>(up) - static_cast<float>(down);
+}
+}
+
+float InputHandler::leftPaddleDirection() const
+{
+    return directionForKeys(window_, GLFW_KEY_W, GLFW_KEY_S);
+}
+
+float InputHandler::rightPaddleDirection() const
+{
+    return directionForKeys(window_, GLFW_KEY_UP, GLFW_KEY_DOWN);
 }

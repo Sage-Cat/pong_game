@@ -1,73 +1,75 @@
 #include "Physics.hpp"
 
-#include <spdlog/spdlog.h>
+#include <cmath>
 
 #include "GameConfig.hpp"
 
-Physics::Physics() {}
-
-void Physics::update(std::vector<GameObject *> &objects)
+Physics::ScoreEvent Physics::update(Ball &ball, const std::vector<Paddle *> &paddles) const
 {
-    Ball *ball = nullptr;
-    std::vector<Paddle *> paddles;
-
-    // Partition the objects for easier processing
-    for (auto &obj : objects)
+    for (const auto *paddle : paddles)
     {
-        if (auto p = dynamic_cast<Ball *>(obj))
+        if (paddle && detectCollision(ball, *paddle))
         {
-            ball = p;
-        }
-        else if (auto p = dynamic_cast<Paddle *>(obj))
-        {
-            paddles.push_back(p);
+            resolveCollision(ball, *paddle);
         }
     }
 
-    // Check ball against paddles
-    for (auto &paddle : paddles)
-    {
-        if (detectCollision(ball, paddle))
-        {
-            resolveCollision(ball, paddle);
-        }
-    }
+    checkWallCollisions(ball, GameConfig::WINDOW_HEIGHT);
 
-    // Check for wall collisions
-    checkWallCollisions(ball, GameConfig::WINDOW_HEIGHT, GameConfig::WINDOW_WIDTH);
+    if (ball.getPosition().x + ball.getSize().x < 0.0f)
+    {
+        return ScoreEvent::RightPlayer;
+    }
+    if (ball.getPosition().x > static_cast<float>(GameConfig::WINDOW_WIDTH))
+    {
+        return ScoreEvent::LeftPlayer;
+    }
+    return ScoreEvent::None;
 }
 
-bool Physics::detectCollision(const GameObject *obj1, const GameObject *obj2) const
+bool Physics::detectCollision(const GameObject &obj1, const GameObject &obj2) const
 {
     // AABB collision detection
-    bool collisionX = obj1->getPosition().x + obj1->getSize().x >= obj2->getPosition().x &&
-                      obj2->getPosition().x + obj2->getSize().x >= obj1->getPosition().x;
-    bool collisionY = obj1->getPosition().y + obj1->getSize().y >= obj2->getPosition().y &&
-                      obj2->getPosition().y + obj2->getSize().y >= obj1->getPosition().y;
+    const bool collisionX = obj1.getPosition().x + obj1.getSize().x >= obj2.getPosition().x &&
+                            obj2.getPosition().x + obj2.getSize().x >= obj1.getPosition().x;
+    const bool collisionY = obj1.getPosition().y + obj1.getSize().y >= obj2.getPosition().y &&
+                            obj2.getPosition().y + obj2.getSize().y >= obj1.getPosition().y;
     return collisionX && collisionY;
 }
 
-void Physics::resolveCollision(Ball *ball, Paddle *paddle)
+void Physics::resolveCollision(Ball &ball, const Paddle &paddle) const
 {
-    // Basic collision resolution for Pong: simply invert ball's Y velocity
-    ball->setVelocity(glm::vec2(ball->getVelocity().x, -ball->getVelocity().y));
-    SPDLOG_INFO("Ball collision with paddle resolved.");
+    const bool paddleIsLeft = paddle.getPosition().x < static_cast<float>(GameConfig::WINDOW_WIDTH) / 2.0f;
+    const float horizontalSpeed = std::abs(ball.getVelocity().x);
+
+    if ((paddleIsLeft && ball.getVelocity().x < 0.0f) ||
+        (!paddleIsLeft && ball.getVelocity().x > 0.0f))
+    {
+        const float newX = paddleIsLeft
+                               ? paddle.getPosition().x + paddle.getSize().x
+                               : paddle.getPosition().x - ball.getSize().x;
+        ball.setPosition({newX, ball.getPosition().y});
+        ball.setVelocity({paddleIsLeft ? horizontalSpeed : -horizontalSpeed,
+                          ball.getVelocity().y});
+    }
 }
 
-void Physics::checkWallCollisions(Ball *ball, const int screenHeight, const int screenWidth)
+void Physics::checkWallCollisions(Ball &ball, const int screenHeight) const
 {
-    if (ball->getPosition().y <= 0 || ball->getPosition().y + ball->getSize().y >= screenHeight)
+    auto position = ball.getPosition();
+    auto velocity = ball.getVelocity();
+
+    if (position.y < 0.0f)
     {
-        // Ball hits top or bottom wall
-        ball->setVelocity(glm::vec2(ball->getVelocity().x, -ball->getVelocity().y));
-        SPDLOG_INFO("Ball collision with wall resolved.");
+        position.y = 0.0f;
+        velocity.y = std::abs(velocity.y);
+    }
+    else if (position.y + ball.getSize().y > static_cast<float>(screenHeight))
+    {
+        position.y = static_cast<float>(screenHeight) - ball.getSize().y;
+        velocity.y = -std::abs(velocity.y);
     }
 
-    if (ball->getPosition().x <= 0 || ball->getPosition().x + ball->getSize().x >= screenWidth)
-    {
-        // Ball hits left or right wall, could reset ball position or handle scoring
-        // For simplicity, just invert X velocity here
-        ball->setVelocity(glm::vec2(-ball->getVelocity().x, ball->getVelocity().y));
-        SPDLOG_INFO("Ball collision with side wall resolved.");
-    }
+    ball.setPosition(position);
+    ball.setVelocity(velocity);
 }

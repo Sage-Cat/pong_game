@@ -1,21 +1,26 @@
 #ifndef PHYSICS_HPP
 #define PHYSICS_HPP
 
-#include "GameObject.hpp"
-#include "Ball.hpp"   // Assuming Ball is a derived class of GameObject
-#include "Paddle.hpp" // Assuming Paddle is also a derived class
+#include "Ball.hpp"
+#include "Paddle.hpp"
 #include <vector>
 
 class Physics
 {
 public:
-    Physics();
-    void update(std::vector<GameObject *> &objects);
+    enum class ScoreEvent
+    {
+        None,
+        LeftPlayer,
+        RightPlayer
+    };
+
+    ScoreEvent update(Ball &ball, const std::vector<Paddle *> &paddles) const;
 
 private:
-    bool detectCollision(const GameObject *obj1, const GameObject *obj2) const;
-    void resolveCollision(Ball *ball, Paddle *paddle);
-    void checkWallCollisions(Ball *ball, const int screenHeight, const int screenWidth);
+    bool detectCollision(const GameObject &obj1, const GameObject &obj2) const;
+    void resolveCollision(Ball &ball, const Paddle &paddle) const;
+    void checkWallCollisions(Ball &ball, int screenHeight) const;
 };
 
 #endif // PHYSICS_HPP

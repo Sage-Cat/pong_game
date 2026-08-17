@@ -16,8 +16,8 @@ void Paddle::update(float dt)
     {
         position_.y = 0.0f;
     }
-    else if (position_.y + size_.y > GameConfig::WINDOW_WIDTH)
+    else if (position_.y + size_.y > GameConfig::WINDOW_HEIGHT)
     {
-        position_.y = static_cast<float>(GameConfig::WINDOW_WIDTH) - size_.y;
+        position_.y = static_cast<float>(GameConfig::WINDOW_HEIGHT) - size_.y;
     }
 }

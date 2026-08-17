@@ -7,6 +7,7 @@ class GameObject
 {
 public:
     GameObject(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec2 &velocity);
+    virtual ~GameObject() = default;
 
     void setPosition(const glm::vec2 &pos);
     void setSize(const glm::vec2 &size);

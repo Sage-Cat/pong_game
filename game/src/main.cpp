@@ -1,17 +1,19 @@
-#include <GLFW/glfw3.h>
+#include <exception>
+#include <string_view>
 
 #include "SpdlogConfig.hpp"
 
 #include "Game.hpp"
 
-int main()
+int main(int argc, char **argv)
 {
     SpdlogConfig::init();
 
     try
     {
         Game game;
-        game.run();
+        const bool smokeTest = argc == 2 && std::string_view(argv[1]) == "--smoke-test";
+        game.run(smokeTest ? 3U : 0U);
     }
     catch (const std::exception &e)
     {

@@ -14,20 +14,24 @@ class Renderer
 public:
     Renderer(int windowWidth, int windowHeight);
     ~Renderer();
+    Renderer(const Renderer &) = delete;
+    Renderer &operator=(const Renderer &) = delete;
+    Renderer(Renderer &&) = delete;
+    Renderer &operator=(Renderer &&) = delete;
 
     void init();
     void drawBall(const Ball &ball);
     void drawPaddle(const Paddle &paddle);
-    void drawScore(int scoreP1, int scoreP2);
     void clear();
 
 private:
     void setupRenderData();
-    GLuint loadShader(const char *shaderPath, GLenum type);
+    GLuint loadShader(const char *shaderPath, GLenum type) const;
     void createShaderProgram();
+    void drawObject(const GameObject &object, const glm::vec3 &color) const;
 
     GLuint VAO_, VBO_;
-    GLuint shaderProgram_; // Shader program ID
+    GLuint shaderProgram_;
     int windowWidth_, windowHeight_;
 };
 

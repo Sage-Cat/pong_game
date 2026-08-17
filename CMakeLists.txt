@@ -1,22 +1,22 @@
-cmake_minimum_required(VERSION 3.10)
-project(pong_game VERSION 1.0)
+cmake_minimum_required(VERSION 3.20)
+project(pong_game VERSION 1.0 LANGUAGES CXX)
 
-# Specify C++ standard
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(glfw3)
-find_package(glew)
-find_package(glm)
-find_package(spdlog)
+include(CTest)
 
-# Set source paths
-set(GAME_DIR ${CMAKE_SOURCE_DIR}/game)
+find_package(glfw3 REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glm REQUIRED)
+find_package(spdlog REQUIRED)
 
-# Set global output directories
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-# Include subdirectories
 add_subdirectory(game)
-# add_subdirectory(test)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
