@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install native dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            g++ \
+            cmake \
+            libglew-dev \
+            libglfw3-dev \
+            libglm-dev \
+            libspdlog-dev \
+            libgl1-mesa-dev \
+            ninja-build \
+            xauth \
+            xvfb
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
+
+      - name: Build
+        run: cmake --build build --parallel 2
+
+      - name: Test deterministic gameplay
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run OpenGL smoke test
+        run: timeout 10s xvfb-run --auto-servernum ./build/bin/pong_game --smoke-test
